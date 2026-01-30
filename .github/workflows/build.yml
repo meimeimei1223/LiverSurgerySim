@@ -18,9 +18,7 @@ jobs:
     - name: Install Dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y build-essential cmake ninja-build \
-          libgl1-mesa-dev libglew-dev libglfw3-dev libfreetype-dev \
-          fuse libfuse2
+        sudo apt-get install -y build-essential cmake ninja-build libgl1-mesa-dev libglew-dev libglfw3-dev libfreetype-dev fuse libfuse2
 
     - name: Build
       run: |
@@ -37,26 +35,19 @@ jobs:
         for dir in model shader shaders data; do
           [ -d "$dir" ] && cp -r "$dir" AppDir/usr/bin/
         done
-        cat > AppDir/LiverSurgerySim.desktop << 'DESK'
-[Desktop Entry]
-Type=Application
-Name=Liver Surgery Simulator
-Exec=LiverSurgerySim
-Icon=LiverSurgerySim
-Categories=Science;
-Terminal=false
-DESK
-        cat > AppDir/LiverSurgerySim.svg << 'ICON'
-<?xml version="1.0"?><svg width="256" height="256" xmlns="http://www.w3.org/2000/svg"><rect width="256" height="256" fill="#8B0000" rx="40"/><text x="128" y="170" font-size="140" text-anchor="middle" fill="white">肝</text></svg>
-ICON
-        cat > AppDir/AppRun << 'RUN'
-#!/bin/bash
-HERE="$(dirname "$(readlink -f "$0")")"
-export LD_LIBRARY_PATH="${HERE}/usr/lib:${LD_LIBRARY_PATH}"
-cd "${HERE}/usr/bin"
-exec ./LiverSurgerySim "$@"
-RUN
+        echo '[Desktop Entry]' > AppDir/LiverSurgerySim.desktop
+        echo 'Type=Application' >> AppDir/LiverSurgerySim.desktop
+        echo 'Name=Liver Surgery Simulator' >> AppDir/LiverSurgerySim.desktop
+        echo 'Exec=LiverSurgerySim' >> AppDir/LiverSurgerySim.desktop
+        echo 'Icon=LiverSurgerySim' >> AppDir/LiverSurgerySim.desktop
+        echo 'Categories=Science;' >> AppDir/LiverSurgerySim.desktop
+        echo 'Terminal=false' >> AppDir/LiverSurgerySim.desktop
+        echo '#!/bin/bash' > AppDir/AppRun
+        echo 'HERE="$(dirname "$(readlink -f "$0")")"' >> AppDir/AppRun
+        echo 'cd "${HERE}/usr/bin"' >> AppDir/AppRun
+        echo 'exec ./LiverSurgerySim "$@"' >> AppDir/AppRun
         chmod +x AppDir/AppRun
+        touch AppDir/LiverSurgerySim.svg
         wget -q https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage -O appimagetool
         chmod +x appimagetool
         ARCH=x86_64 ./appimagetool --appimage-extract-and-run AppDir LiverSurgerySim-linux-x86_64.AppImage
@@ -85,13 +76,17 @@ RUN
     - name: Package
       shell: pwsh
       run: |
-        $OUT = "dist/LiverSurgerySim-windows-x64"
-        New-Item -ItemType Directory -Force -Path $OUT
-        $exe = Get-ChildItem -Path "build" -Recurse -Filter "LiverSurgerySim.exe" | Select-Object -First 1
-        Copy-Item $exe.FullName -Destination $OUT
-        Get-ChildItem "$env:VCPKG_ROOT/installed/x64-windows/bin/*.dll" | Copy-Item -Destination $OUT
-        @("model","shader","shaders","data") | ForEach-Object { if(Test-Path $_){Copy-Item -Recurse $_ -Destination "$OUT/$_"} }
-        Compress-Archive -Path "$OUT/*" -DestinationPath "LiverSurgerySim-windows-x64.zip"
+        New-Item -ItemType Directory -Force -Path dist
+        $exe = Get-ChildItem -Path build -Recurse -Filter LiverSurgerySim.exe | Select-Object -First 1
+        Copy-Item $exe.FullName -Destination dist/
+        if (Test-Path "$env:VCPKG_ROOT/installed/x64-windows/bin") {
+          Get-ChildItem "$env:VCPKG_ROOT/installed/x64-windows/bin/*.dll" | Copy-Item -Destination dist/
+        }
+        if (Test-Path model) { Copy-Item -Recurse model -Destination dist/ }
+        if (Test-Path shader) { Copy-Item -Recurse shader -Destination dist/ }
+        if (Test-Path shaders) { Copy-Item -Recurse shaders -Destination dist/ }
+        if (Test-Path data) { Copy-Item -Recurse data -Destination dist/ }
+        Compress-Archive -Path dist/* -DestinationPath LiverSurgerySim-windows-x64.zip
 
     - uses: actions/upload-artifact@v4
       with:
