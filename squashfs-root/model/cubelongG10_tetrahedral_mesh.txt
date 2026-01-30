@@ -1,0 +1,12 @@
+# Direct voxel-based tetrahedral mesh
+# Grid: 8×8×8
+# Vertices: 0
+# Tetrahedra: 0
+
+VERTICES
+
+TETRAHEDRA
+
+EDGES
+
+SURFACE_TRIANGLES

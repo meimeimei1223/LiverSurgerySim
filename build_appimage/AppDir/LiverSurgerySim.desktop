@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Liver Surgery Simulator
+Comment=Real-time liver surgery simulation
+Exec=LiverSurgerySim
+Icon=LiverSurgerySim
+Categories=Science;Education;
+Terminal=false

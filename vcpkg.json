@@ -1,0 +1,33 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+  "name": "liver-surgery-sim",
+  "version": "1.2.0",
+  "description": "Real-time liver surgery simulation with soft body physics",
+  "license": "MIT",
+  "supports": "windows & x64 | linux & x64",
+  
+  "dependencies": [
+    {
+      "name": "glfw3",
+      "version>=": "3.3.8"
+    },
+    {
+      "name": "glew",
+      "version>=": "2.2.0"
+    },
+    {
+      "name": "glm",
+      "version>=": "0.9.9"
+    },
+    {
+      "name": "stb"
+    },
+    {
+      "name": "freetype",
+      "version>=": "2.12.0"
+    }
+  ],
+  
+  "overrides": [],
+  "builtin-baseline": "2024.12.16"
+}

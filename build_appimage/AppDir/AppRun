@@ -1,0 +1,15 @@
+#!/bin/bash
+HERE="$(dirname "$(readlink -f "$0")")"
+APPIMAGE_DIR="$(dirname "$(readlink -f "${APPIMAGE:-$0}")")"
+
+export LD_LIBRARY_PATH="${HERE}/usr/lib:${LD_LIBRARY_PATH}"
+
+# 外部モデルがあれば環境変数で設定
+if [ -d "${APPIMAGE_DIR}/model" ]; then
+    export LIVER_MODEL_PATH="${APPIMAGE_DIR}/model/"
+    echo "Using external model: ${LIVER_MODEL_PATH}"
+fi
+
+# 実行ファイルのディレクトリに移動して実行
+cd "${HERE}/usr/bin"
+exec ./LiverSurgerySim "$@"

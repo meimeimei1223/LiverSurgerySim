@@ -1,0 +1,194 @@
+{
+  "version": 6,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 21,
+    "patch": 0
+  },
+  
+  "configurePresets": [
+    {
+      "name": "base",
+      "hidden": true,
+      "description": "Base configuration for all presets",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "installDir": "${sourceDir}/install/${presetName}",
+      "cacheVariables": {
+        "CMAKE_CXX_STANDARD": "17",
+        "CMAKE_CXX_STANDARD_REQUIRED": "ON",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+      }
+    },
+    
+    {
+      "name": "vcpkg-base",
+      "hidden": true,
+      "inherits": "base",
+      "description": "Base configuration with vcpkg",
+      "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": {
+          "type": "FILEPATH",
+          "value": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+        }
+      }
+    },
+    
+    {
+      "name": "linux-base",
+      "hidden": true,
+      "inherits": "vcpkg-base",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      },
+      "cacheVariables": {
+        "VCPKG_TARGET_TRIPLET": "x64-linux"
+      }
+    },
+    
+    {
+      "name": "windows-base",
+      "hidden": true,
+      "inherits": "vcpkg-base",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      },
+      "architecture": {
+        "value": "x64",
+        "strategy": "set"
+      }
+    },
+    
+    {
+      "name": "linux-debug",
+      "displayName": "Linux Debug",
+      "description": "Linux debug build",
+      "inherits": "linux-base",
+      "generator": "Ninja",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "USE_GEOGRAM": "ON"
+      }
+    },
+    
+    {
+      "name": "linux-release",
+      "displayName": "Linux Release",
+      "description": "Linux optimized release build",
+      "inherits": "linux-base",
+      "generator": "Ninja",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "USE_GEOGRAM": "ON",
+        "ENABLE_AVX2": "OFF",
+        "ENABLE_SSE2": "ON"
+      }
+    },
+    
+    {
+      "name": "linux-appimage",
+      "displayName": "Linux AppImage",
+      "description": "Linux build for AppImage packaging",
+      "inherits": "linux-base",
+      "generator": "Ninja",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_INSTALL_PREFIX": "/usr",
+        "BUILD_STATIC": "ON",
+        "USE_GEOGRAM": "ON",
+        "ENABLE_AVX2": "OFF",
+        "ENABLE_SSE2": "ON"
+      }
+    },
+    
+    {
+      "name": "windows-debug",
+      "displayName": "Windows x64 Debug",
+      "description": "Windows debug build with Visual Studio",
+      "inherits": "windows-base",
+      "generator": "Visual Studio 17 2022",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "VCPKG_TARGET_TRIPLET": "x64-windows",
+        "USE_GEOGRAM": "OFF"
+      }
+    },
+    
+    {
+      "name": "windows-release",
+      "displayName": "Windows x64 Release",
+      "description": "Windows optimized release build",
+      "inherits": "windows-base",
+      "generator": "Visual Studio 17 2022",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "VCPKG_TARGET_TRIPLET": "x64-windows",
+        "USE_GEOGRAM": "OFF"
+      }
+    },
+    
+    {
+      "name": "windows-static",
+      "displayName": "Windows x64 Static",
+      "description": "Windows static build (minimal DLL dependencies)",
+      "inherits": "windows-base",
+      "generator": "Visual Studio 17 2022",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "VCPKG_TARGET_TRIPLET": "x64-windows-static",
+        "BUILD_STATIC": "ON",
+        "USE_GEOGRAM": "OFF"
+      }
+    },
+    
+    {
+      "name": "windows-ninja",
+      "displayName": "Windows x64 Ninja",
+      "description": "Windows build with Ninja (faster builds)",
+      "inherits": "windows-base",
+      "generator": "Ninja",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "VCPKG_TARGET_TRIPLET": "x64-windows",
+        "USE_GEOGRAM": "OFF"
+      }
+    }
+  ],
+  
+  "buildPresets": [
+    {
+      "name": "linux-debug",
+      "configurePreset": "linux-debug"
+    },
+    {
+      "name": "linux-release",
+      "configurePreset": "linux-release"
+    },
+    {
+      "name": "linux-appimage",
+      "configurePreset": "linux-appimage"
+    },
+    {
+      "name": "windows-debug",
+      "configurePreset": "windows-debug",
+      "configuration": "Debug"
+    },
+    {
+      "name": "windows-release",
+      "configurePreset": "windows-release",
+      "configuration": "Release"
+    },
+    {
+      "name": "windows-static",
+      "configurePreset": "windows-static",
+      "configuration": "Release"
+    },
+    {
+      "name": "windows-ninja",
+      "configurePreset": "windows-ninja"
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Liver Surgery Simulator
+Exec=AppRun
+Icon=LiverSurgerySim
+Categories=Science;
+Terminal=false
